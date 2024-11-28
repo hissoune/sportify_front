@@ -46,7 +46,7 @@ const Register = () => {
     <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-500 to-indigo-800">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
         <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-6">
-          Create an Account
+        <img src="/2bed3446db10b86af56e902479b3a9df-removebg-preview.png" alt="" />
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
