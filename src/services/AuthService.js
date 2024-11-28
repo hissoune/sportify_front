@@ -1,4 +1,4 @@
-import axiosInstance from './axiosInstance';
+import axiosInstance from '../client/axiosInstance';
 
 const AuthService = {
 
@@ -15,3 +15,5 @@ const AuthService = {
       },
     
 }
+
+export default AuthService;
