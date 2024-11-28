@@ -1,20 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllEvents } from "../redux/slices/EventSlice";
 
 const EventPage = () => {
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      name: "React Workshop",
-      date: "2024-06-20",
-      location: "San Francisco",
-      members: ["Alice", "Bob", "Charlie"],
-      image: "https://www.eventbookings.com/wp-content/uploads/2024/01/Different-Types-of-Events-in-2024-Which-is-Right-for-You-2048x1365.jpg", // Placeholder image
-    },
-  ]);
+  const dispatch = useDispatch();
+  const { events, loading, error } = useSelector((state) => state.events);
 
   const [showModal, setShowModal] = useState(false);
   const [currentEvent, setCurrentEvent] = useState(null);
+
+  useEffect(() => {
+    dispatch(getAllEvents());
+  }, [dispatch]);
 
   const handleOpenModal = (event = null) => {
     setCurrentEvent(event);
@@ -23,16 +21,30 @@ const EventPage = () => {
 
   const handleSubmit = (eventData) => {
     if (currentEvent) {
-      setEvents(events.map((e) => (e.id === currentEvent.id ? eventData : e)));
+      // Dispatch update event action
+      // Assuming you have an update event action
+      // dispatch(updateEvent(eventData));
     } else {
-      setEvents([...events, { ...eventData, id: events.length + 1 }]);
+      // Dispatch create event action
+      // Assuming you have a create event action
+      // dispatch(createEvent(eventData));
     }
     setShowModal(false);
   };
 
   const handleDelete = (id) => {
-    setEvents(events.filter((e) => e.id !== id));
+    // Dispatch delete event action
+    // Assuming you have a delete event action
+    // dispatch(deleteEvent(id));
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className="container mx-auto p-6">
@@ -46,13 +58,13 @@ const EventPage = () => {
       </button>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {events.map((event) => (
+        {events?.map((event) => (
           <div
-            key={event.id}
+            key={event._id}
             className="bg-white shadow-lg rounded-lg overflow-hidden"
           >
             <img
-              src={event.image}
+              src={event.imagePath}
               alt={event.name}
               className="w-full h-40 object-cover"
             />
@@ -65,7 +77,7 @@ const EventPage = () => {
                 <strong>Location:</strong> {event.location}
               </p>
               <p className="text-gray-600 mb-4">
-                <strong>Members:</strong> {event.members.join(", ")}
+                <strong>Members:</strong> {event.participants.join(", ")}
               </p>
               <div className="flex justify-between">
                 <button
@@ -105,6 +117,7 @@ const EventPage = () => {
                 };
                 handleSubmit(newEvent);
               }}
+              encType="multipart/form-data"
             >
               <div className="mb-4">
                 <label htmlFor="name" className="block text-sm font-semibold">
@@ -158,9 +171,9 @@ const EventPage = () => {
                   Image URL
                 </label>
                 <input
-                  type="text"
+                  type="file"
                   name="image"
-                  defaultValue={currentEvent?.image || ""}
+                  defaultValue={currentEvent?.imageUrl || ""}
                   className="w-full px-4 py-2 border rounded-lg"
                 />
               </div>
