@@ -1,8 +1,16 @@
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { register } from "../../redux/slices/AuthSlice";
+import Swal from "sweetalert2"; // Import SweetAlert2
+import { useNavigate } from "react-router-dom"; // For navigation
 
 const Register = () => {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [errors, setErrors] = useState({ name: "", email: "", password: "" });
+  const dispatch = useDispatch();
+  const navigate = useNavigate(); // Use navigate hook
+
+  const { isLoading, error } = useSelector((state) => state.auth);
 
   const validateEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
@@ -34,11 +42,20 @@ const Register = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!errors.name && !errors.email && !errors.password) {
-      console.log("Registering with", form);
-      // Add your registration logic here
+      const result = await dispatch(register(form));
+      if (register.fulfilled.match(result)) {
+        Swal.fire({
+          title: `Hi, ${form.name}!`,
+          text: "Your registration is successful. Click below to login.",
+          icon: "success",
+          confirmButtonText: "Go to Login",
+        }).then(() => {
+          navigate("/"); // Redirect to login
+        });
+      }
     }
   };
 
@@ -46,13 +63,11 @@ const Register = () => {
     <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-500 to-indigo-800">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
         <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-6">
-        <img src="/2bed3446db10b86af56e902479b3a9df-removebg-preview.png" alt="" />
+          <img src="/2bed3446db10b86af56e902479b3a9df-removebg-preview.png" alt="" />
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-600">
-              Name
-            </label>
+            <label className="block text-sm font-semibold text-gray-600">Name</label>
             <input
               type="text"
               name="name"
@@ -69,9 +84,7 @@ const Register = () => {
             )}
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-600">
-              Email Address
-            </label>
+            <label className="block text-sm font-semibold text-gray-600">Email Address</label>
             <input
               type="email"
               name="email"
@@ -88,9 +101,7 @@ const Register = () => {
             )}
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-600">
-              Password
-            </label>
+            <label className="block text-sm font-semibold text-gray-600">Password</label>
             <input
               type="password"
               name="password"
@@ -109,9 +120,9 @@ const Register = () => {
           <button
             type="submit"
             className="w-full py-2 text-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg hover:shadow-lg hover:from-blue-600 hover:to-indigo-700 transition duration-300"
-            disabled={errors.name || errors.email || errors.password}
+            disabled={errors.name || errors.email || errors.password || isLoading}
           >
-            Register
+            {isLoading ? "Registering..." : "Register"}
           </button>
         </form>
         <p className="mt-4 text-center text-sm text-gray-600">
