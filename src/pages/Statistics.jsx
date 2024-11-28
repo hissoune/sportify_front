@@ -30,16 +30,13 @@ const Statistics = () => {
   };
 
   return (
-    <div className="p-4 bg-gray-100 min-h-screen">
-      {/* Title */}
+    <div className="p-4  min-h-screen">
       <div className="mb-6">
         <h1 className="text-xl font-bold text-gray-800">Dashboard Statistics</h1>
         <p className="text-sm text-gray-600">Overview of user activity and growth metrics.</p>
       </div>
 
-      {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Bar Chart */}
         <div className="bg-white shadow-md rounded-lg p-4 flex flex-col items-center">
           <h2 className="text-base font-semibold text-gray-700 mb-4">Monthly User Growth</h2>
           <div className="w-full" style={{ height: "200px" }}>
@@ -47,7 +44,6 @@ const Statistics = () => {
           </div>
         </div>
 
-        {/* Pie Chart */}
         <div className="bg-white shadow-md rounded-lg p-4 flex flex-col items-center">
           <h2 className="text-base font-semibold text-gray-700 mb-4">User Activity Distribution</h2>
           <div className="w-full" style={{ height: "200px" }}>
@@ -55,8 +51,7 @@ const Statistics = () => {
           </div>
         </div>
 
-        {/* Key Metrics */}
-        <div className="bg-white shadow-md rounded-lg p-4 grid grid-cols-1 gap-4">
+        <div className=" shadow-md rounded-lg p-4 grid grid-cols-1 gap-4">
           <div className="flex items-center">
             <div className="bg-blue-600 text-white w-12 h-12 flex items-center justify-center rounded-full">
               <span className="text-lg font-bold">👥</span>
