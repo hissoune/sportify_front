@@ -1,11 +1,12 @@
+import { Routes } from "react-router-dom"
 
 
 function App() {
 
   return (
-    <>
-      <h1 className="text-2xl text-red-500">hhhhh</h1>
-    </>
+   <Routes>
+    <Route />
+   </Routes>
   )
 }
 
