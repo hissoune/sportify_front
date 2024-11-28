@@ -1,14 +1,26 @@
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../../redux/slices/AuthSlice";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ email: "", password: "" });
 
-  const validateEmail = (value) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(value);
-  };
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isLoading, error, user } = useSelector((state) => state.auth);
+
+  React.useEffect(() => {
+    if (user?.role == 'organizer') {
+      console.log(user.name);
+      
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
+
+  const validateEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
   const handleEmailChange = (e) => {
     const value = e.target.value;
@@ -31,7 +43,7 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!errors.email && !errors.password) {
-      console.log("Logging in with", { email, password });
+      dispatch(login({ email, password }));
     }
   };
 
@@ -41,12 +53,14 @@ const Login = () => {
         <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-6">
           Welcome Back
         </h2>
+        {error && (
+          <p className="text-center text-red-500 mb-4">
+            {error.message || "Login failed!"}
+          </p>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label
-              className="block text-sm font-semibold text-gray-600"
-              htmlFor="email"
-            >
+            <label className="block text-sm font-semibold text-gray-600" htmlFor="email">
               Email Address
             </label>
             <input
@@ -65,10 +79,7 @@ const Login = () => {
             )}
           </div>
           <div className="mb-4">
-            <label
-              className="block text-sm font-semibold text-gray-600"
-              htmlFor="password"
-            >
+            <label className="block text-sm font-semibold text-gray-600" htmlFor="password">
               Password
             </label>
             <input
@@ -88,18 +99,19 @@ const Login = () => {
           </div>
           <button
             type="submit"
-            className="w-full py-2 text-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg hover:shadow-lg hover:from-blue-600 hover:to-indigo-700 transition duration-300"
-            disabled={errors.email || errors.password}
+            className={`w-full py-2 text-lg font-semibold text-white rounded-lg hover:shadow-lg transition duration-300 ${
+              isLoading || !email || !password || errors.email || errors.password
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
+            }`}
+            disabled={isLoading || !email || !password || errors.email || errors.password}
           >
-            Login
+            {isLoading ? "Logging in..." : "Login"}
           </button>
         </form>
         <p className="mt-4 text-center text-sm text-gray-600">
           Don't have an account?{" "}
-          <a
-            href="/register"
-            className="text-blue-500 hover:underline hover:text-blue-600"
-          >
+          <a href="/register" className="text-blue-500 hover:underline hover:text-blue-600">
             Sign Up
           </a>
         </p>
