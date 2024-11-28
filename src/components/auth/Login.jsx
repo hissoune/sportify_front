@@ -14,9 +14,12 @@ const Login = () => {
 
   React.useEffect(() => {
     if (user?.role == 'organizer') {
-      console.log(user.name);
       
       navigate("/dashboard");
+    }else if (user?.role == 'participant'){
+      navigate("/home");
+    }else {
+      navigate("/");
     }
   }, [user, navigate]);
 
