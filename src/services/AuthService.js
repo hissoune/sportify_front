@@ -13,6 +13,17 @@ const AuthService = {
           throw error; 
         }
       },
+      register:async (name,email,password) =>{
+        try {
+            const response= await  axiosInstance.post('/auth/register' ,{name,email,password});
+           
+            
+            return  response.data;
+        } catch (error) {
+            console.error('register failed:', error);
+            throw error; 
+        }
+      },
     
 }
 
