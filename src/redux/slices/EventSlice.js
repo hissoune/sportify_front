@@ -14,6 +14,19 @@ export const getAllEvents = createAsyncThunk(
     }
 );
 
+export const createEvent = createAsyncThunk(
+    'events/create',
+    async (formdata,{ rejectWithValue })=>{
+        try {
+            const response = await EventsService.createEvent(formdata); 
+            return response; 
+        } catch (error) {
+      
+            return rejectWithValue(error.response ? error.response.data : 'An error occurred');
+        }
+    }
+)
+
 const initialState = {
     events: [],
     event:{},
@@ -36,6 +49,18 @@ const eventsSlice = createSlice({
                 state.events = action.payload;
             })
             .addCase(getAllEvents.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(createEvent.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(createEvent.fulfilled, (state, action) => {
+                state.loading = false;
+                state.events = [...state.events, action.payload]; 
+            })
+            .addCase(createEvent.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });
