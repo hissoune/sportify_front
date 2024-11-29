@@ -36,6 +36,17 @@ updateEvent:async (id,formdata)=>{
         console.error('updating events failed:', error);
         throw error; 
       }
+},
+delteEvent:async (id)=>{
+    try {
+        const response = await axiosInstance.delete(`/events/${id}`);
+       
+        
+        return response.data; 
+      } catch (error) {
+        console.error('deleting  events failed:', error);
+        throw error; 
+      }
 }
 
 }

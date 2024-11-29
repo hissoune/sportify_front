@@ -27,6 +27,7 @@ export const createEvent = createAsyncThunk(
     }
 );
 
+
 export const updateEvent = createAsyncThunk(
     'events/update',
     async ({ id, formData }, { rejectWithValue }) => {
@@ -38,6 +39,19 @@ export const updateEvent = createAsyncThunk(
       }
     }
   );
+
+
+  export const deleteEvent = createAsyncThunk(
+    'events/delete',
+    async (id, { rejectWithValue }) => {
+        try {
+            const response = await EventsService.delteEvent(id); 
+            return id; 
+        } catch (error) {
+            return rejectWithValue(error.response ? error.response.data : 'An error occurred');
+        }
+    }
+);
 
 const initialState = {
     events: [],
@@ -90,7 +104,19 @@ const eventsSlice = createSlice({
               .addCase(updateEvent.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-              });
+              })
+              .addCase(deleteEvent.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(deleteEvent.fulfilled, (state, action) => {
+                state.loading = false;
+                state.events = state.events.filter(event => event.id !== action.payload);
+            })
+            .addCase(deleteEvent.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
     }
 });
 
