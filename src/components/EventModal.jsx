@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 
 const EventModal = ({ isOpen, onClose, onSubmit, currentEvent }) => {
   const [formData, setFormData] = useState({
@@ -8,6 +9,7 @@ const EventModal = ({ isOpen, onClose, onSubmit, currentEvent }) => {
     participants: "",
     image: null,
   });
+  const [error, setError] = useState(null); 
 
   useEffect(() => {
     if (currentEvent) {
@@ -30,7 +32,6 @@ const EventModal = ({ isOpen, onClose, onSubmit, currentEvent }) => {
       });
     }
   }, [currentEvent]);
-  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -43,6 +44,22 @@ const EventModal = ({ isOpen, onClose, onSubmit, currentEvent }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const selectedDate = new Date(formData.date);
+    const currentDate = new Date();
+    const twentyFourHoursLater = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
+
+    if (selectedDate <= twentyFourHoursLater) {
+      setError("The date must be at least 24 hours later than the current time.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Date',
+        text: "The date must be at least 24 hours later than the current time.",
+      });
+      return;
+    }
+
+    setError(null); 
     const formattedData = {
       ...formData,
       participants: formData.participants.split(",").map((p) => p.trim()),
@@ -84,6 +101,7 @@ const EventModal = ({ isOpen, onClose, onSubmit, currentEvent }) => {
               className="w-full px-4 py-2 border rounded-lg"
               required
             />
+            {error && <p className="text-red-500 text-sm mt-1">{error}</p>} 
           </div>
           <div className="mb-4">
             <label htmlFor="location" className="block text-sm font-semibold">
