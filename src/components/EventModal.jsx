@@ -13,10 +13,12 @@ const EventModal = ({ isOpen, onClose, onSubmit, currentEvent }) => {
     if (currentEvent) {
       setFormData({
         name: currentEvent.name || "",
-        date: currentEvent.date || "",
+        date: currentEvent.date
+          ? new Date(currentEvent.date).toISOString().split("T")[0] 
+          : "",
         location: currentEvent.location || "",
         participants: currentEvent.participants.join(", ") || "",
-        image: null, // Leave null because files are not prefilled
+        image: null,
       });
     } else {
       setFormData({
@@ -28,6 +30,7 @@ const EventModal = ({ isOpen, onClose, onSubmit, currentEvent }) => {
       });
     }
   }, [currentEvent]);
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,7 +47,7 @@ const EventModal = ({ isOpen, onClose, onSubmit, currentEvent }) => {
       ...formData,
       participants: formData.participants.split(",").map((p) => p.trim()),
     };
-    onSubmit(formattedData); // Call parent `onSubmit` handler
+    onSubmit(formattedData);
   };
 
   if (!isOpen) return null;
