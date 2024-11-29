@@ -13,6 +13,21 @@ export const getAllParticipants = createAsyncThunk(
   }
 );
 
+export const createParticipant = createAsyncThunk(
+    'participants/create',
+    async (formData, { rejectWithValue }) => {
+        console.log(formData);
+        
+        console.log(name)
+      try {
+        const response = await ParticipantService.createParticipant(formData);
+        return response; 
+      } catch (error) {
+        return rejectWithValue(error.response ? error.response.data : 'An error occurred');
+      }
+    }
+  );
+
 const initialState = {
   participants: [],
   participant: {}, 
@@ -41,6 +56,18 @@ const participantSlice = createSlice({
       .addCase(getAllParticipants.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload; 
+      })
+      .addCase(createParticipant.pending, (state) => {
+        state.createLoading = true;
+        state.createError = null;
+      })
+      .addCase(createParticipant.fulfilled, (state, action) => {
+        state.createLoading = false;
+        state.participants.push(action.payload);
+      })
+      .addCase(createParticipant.rejected, (state, action) => {
+        state.createLoading = false;
+        state.createError = action.payload; 
       });
   },
 });
