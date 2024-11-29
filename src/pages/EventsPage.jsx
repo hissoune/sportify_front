@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllEvents } from "../redux/slices/EventSlice";
+import { getAllEvents, createEvent } from "../redux/slices/EventSlice";
+import EventModal from "../components/EventModal";
 
 const EventPage = () => {
   const dispatch = useDispatch();
@@ -19,23 +20,32 @@ const EventPage = () => {
     setShowModal(true);
   };
 
-  const handleSubmit = (eventData) => {
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setCurrentEvent(null);
+  };
+
+  const handleModalSubmit = (eventData) => {
     if (currentEvent) {
       // Dispatch update event action
-      // Assuming you have an update event action
-      // dispatch(updateEvent(eventData));
+      console.log("Updating event:", eventData);
     } else {
       // Dispatch create event action
-      // Assuming you have a create event action
-      // dispatch(createEvent(eventData));
+      dispatch(createEvent(eventData))
+        .unwrap()
+        .then(() => {
+          dispatch(getAllEvents());
+        })
+        .catch((err) => {
+          console.error("Failed to create event:", err);
+        });
     }
-    setShowModal(false);
+    handleCloseModal();
   };
 
   const handleDelete = (id) => {
     // Dispatch delete event action
-    // Assuming you have a delete event action
-    // dispatch(deleteEvent(id));
+    console.log("Deleting event:", id);
   };
 
   if (loading) {
@@ -98,104 +108,12 @@ const EventPage = () => {
         ))}
       </div>
 
-      {showModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg w-96">
-            <h2 className="text-2xl font-bold mb-4">
-              {currentEvent ? "Update Event" : "Create Event"}
-            </h2>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                const newEvent = {
-                  name: formData.get("name"),
-                  date: formData.get("date"),
-                  location: formData.get("location"),
-                  members: formData.get("members").split(","),
-                  image: formData.get("image"),
-                };
-                handleSubmit(newEvent);
-              }}
-              encType="multipart/form-data"
-            >
-              <div className="mb-4">
-                <label htmlFor="name" className="block text-sm font-semibold">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  defaultValue={currentEvent?.name || ""}
-                  className="w-full px-4 py-2 border rounded-lg"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="date" className="block text-sm font-semibold">
-                  Date
-                </label>
-                <input
-                  type="date"
-                  name="date"
-                  defaultValue={currentEvent?.date || ""}
-                  className="w-full px-4 py-2 border rounded-lg"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="location" className="block text-sm font-semibold">
-                  Location
-                </label>
-                <input
-                  type="text"
-                  name="location"
-                  defaultValue={currentEvent?.location || ""}
-                  className="w-full px-4 py-2 border rounded-lg"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="members" className="block text-sm font-semibold">
-                  Members (comma-separated)
-                </label>
-                <input
-                  type="text"
-                  name="members"
-                  defaultValue={currentEvent?.members?.join(", ") || ""}
-                  className="w-full px-4 py-2 border rounded-lg"
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="image" className="block text-sm font-semibold">
-                  Image URL
-                </label>
-                <input
-                  type="file"
-                  name="image"
-                  defaultValue={currentEvent?.imageUrl || ""}
-                  className="w-full px-4 py-2 border rounded-lg"
-                />
-              </div>
-              <div className="flex justify-between">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="bg-gray-500 text-white px-4 py-2 rounded-lg"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg"
-                >
-                  {currentEvent ? "Update" : "Create"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <EventModal
+        isOpen={showModal}
+        onClose={handleCloseModal}
+        onSubmit={handleModalSubmit}
+        currentEvent={currentEvent}
+      />
     </div>
   );
 };
