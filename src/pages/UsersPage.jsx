@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllParticipants } from "../redux/slices/ParticipantsSlice";
+import UserModal from "../components/UserModal";
 
 const UsersPage = () => {
   const dispatch = useDispatch();
@@ -21,22 +22,12 @@ const UsersPage = () => {
   };
 
   const handleDelete = (id) => {
-    setUsers(users.filter((user) => user.id !== id));
-  };
-
-  const handleSubmit = (userData) => {
-    if (currentUser) {
-      setUsers(users.map((u) => (u.id === currentUser.id ? userData : u)));
-    } else {
-      setUsers([...users, { ...userData, id: users.length + 1 }]);
-    }
-    setShowModal(false);
   };
 
   const filteredParticipants = participants.filter((participant) =>
     participant.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -76,12 +67,10 @@ const UsersPage = () => {
               />
               <div>
                 <h2 className="text-xl font-semibold">{user.name}</h2>
-                <p className="text-gray-600 truncate">{user.email}</p> {/* Ensure email is wrapped within the card */}
+                <p className="text-gray-600 truncate">{user.email}</p>
                 <span
                   className={`inline-block px-2 py-1 mt-1 rounded-full text-sm ${
-                    user.role === "organizer"
-                      ? "bg-red-100 text-red-600"
-                      : "bg-blue-100 text-blue-600"
+                    user.role === "organizer" ? "bg-red-100 text-red-600" : "bg-blue-100 text-blue-600"
                   }`}
                 >
                   {user.role}
@@ -96,7 +85,7 @@ const UsersPage = () => {
                 <FaEdit />
               </button>
               <button
-                onClick={() => handleDelete(user.id)}
+                onClick={() => handleDelete(user._id)} // Use _id for deletion
                 className="text-red-500 hover:text-red-600"
               >
                 <FaTrashAlt />
@@ -107,95 +96,10 @@ const UsersPage = () => {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg w-96">
-            <h2 className="text-2xl font-bold mb-4">
-              {currentUser ? "Update User" : "Add User"}
-            </h2>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                const newUser = {
-                  name: formData.get("name"),
-                  email: formData.get("email"),
-                  role: formData.get("role"),
-                  profilePicture:
-                    formData.get("profilePicture") ||
-                    "https://via.placeholder.com/100",
-                };
-                handleSubmit(newUser);
-              }}
-            >
-              <div className="mb-4">
-                <label htmlFor="name" className="block text-sm font-semibold">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  defaultValue={currentUser?.name || ""}
-                  className="w-full px-4 py-2 border rounded-lg"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="email" className="block text-sm font-semibold">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  defaultValue={currentUser?.email || ""}
-                  className="w-full px-4 py-2 border rounded-lg"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="role" className="block text-sm font-semibold">
-                  Role
-                </label>
-                <select
-                  name="role"
-                  defaultValue={currentUser?.role || "User"}
-                  className="w-full px-4 py-2 border rounded-lg"
-                >
-                  <option value="Admin">Admin</option>
-                  <option value="User">User</option>
-                </select>
-              </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="profilePicture"
-                  className="block text-sm font-semibold"
-                >
-                  Profile Picture URL
-                </label>
-                <input
-                  type="text"
-                  name="profilePicture"
-                  defaultValue={currentUser?.profilePicture || ""}
-                  className="w-full px-4 py-2 border rounded-lg"
-                />
-              </div>
-              <div className="flex justify-between">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="bg-gray-500 text-white px-4 py-2 rounded-lg"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg"
-                >
-                  {currentUser ? "Update" : "Add"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <UserModal
+          currentUser={currentUser}
+          closeModal={() => setShowModal(false)}
+        />
       )}
     </div>
   );
