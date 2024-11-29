@@ -1,19 +1,27 @@
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { register } from "../../redux/slices/AuthSlice";
-import Swal from "sweetalert2"; // Import SweetAlert2
-import { useNavigate } from "react-router-dom"; // For navigation
+import React, { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { createParticipant } from "../redux/slices/ParticipantsSlice";
+import Swal from "sweetalert2";
 
-const Register = () => {
+const UserModal = ({ currentUser, closeModal }) => {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [errors, setErrors] = useState({ name: "", email: "", password: "" });
   const dispatch = useDispatch();
-  const navigate = useNavigate(); 
 
-  const { isLoading, error } = useSelector((state) => state.auth);
+  // Prefill form if editing an existing user
+  useEffect(() => {
+    if (currentUser) {
+      setForm({
+        name: currentUser.name || "",
+        email: currentUser.email || "",
+        password: "", // Keep password empty for security
+      });
+      setErrors({ name: "", email: "", password: "" });
+    }
+  }, [currentUser]);
 
+  // Validation functions
   const validateEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-
   const validatePassword = (value) =>
     value.length >= 6 ? "" : "Password must be at least 6 characters.";
 
@@ -44,30 +52,41 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  console.log(form)
+    // Check if there are no errors
     if (!errors.name && !errors.email && !errors.password) {
-      const result = await dispatch(register(form));
-      if (register.fulfilled.match(result)) {
+      const actionPayload = { ...form }; 
+      console.log(actionPayload);
+      
+      const action = createParticipant(actionPayload);
+      const result = await dispatch(action);
+  
+      if (createParticipant.fulfilled.match(result)) {
         Swal.fire({
-          title: `Hi, ${form.name}!`,
-          text: "Your registration is successful. Click below to login.",
+          title: currentUser ? "User Updated!" : "User Created!",
+          text: currentUser
+            ? `${form.name}'s information has been updated.`
+            : `User ${form.name} has been successfully created.`,
           icon: "success",
-          confirmButtonText: "Go to Login",
+          confirmButtonText: "Close",
         }).then(() => {
-          navigate("/"); 
+          closeModal(); 
         });
       }
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-500 to-indigo-800">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-6">
-          <img src="/2bed3446db10b86af56e902479b3a9df-removebg-preview.png" alt="" />
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+      <div className="bg-white p-6 rounded-lg w-96">
+        <h2 className="text-2xl font-bold mb-4">
+          {currentUser ? "Update User" : "Add User"}
         </h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} >
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-600">Name</label>
+            <label htmlFor="name" className="block text-sm font-semibold">
+              Name
+            </label>
             <input
               type="text"
               name="name"
@@ -84,7 +103,9 @@ const Register = () => {
             )}
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-600">Email Address</label>
+            <label htmlFor="email" className="block text-sm font-semibold">
+              Email Address
+            </label>
             <input
               type="email"
               name="email"
@@ -101,7 +122,9 @@ const Register = () => {
             )}
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-600">Password</label>
+            <label htmlFor="password" className="block text-sm font-semibold">
+              Password
+            </label>
             <input
               type="password"
               name="password"
@@ -111,32 +134,32 @@ const Register = () => {
               } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400`}
               value={form.password}
               onChange={handleChange}
-              required
+              required={!currentUser} // Password required only for new users
             />
             {errors.password && (
               <p className="text-sm text-red-500 mt-1">{errors.password}</p>
             )}
           </div>
-          <button
-            type="submit"
-            className="w-full py-2 text-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg hover:shadow-lg hover:from-blue-600 hover:to-indigo-700 transition duration-300"
-            disabled={errors.name || errors.email || errors.password || isLoading}
-          >
-            {isLoading ? "Registering..." : "Register"}
-          </button>
+          <div className="flex justify-between">
+            <button
+              type="button"
+              onClick={closeModal}
+              className="bg-gray-500 text-white px-4 py-2 rounded-lg"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+              disabled={errors.name || errors.email || errors.password}
+            >
+              {currentUser ? "Update" : "Add"}
+            </button>
+          </div>
         </form>
-        <p className="mt-4 text-center text-sm text-gray-600">
-          Already have an account?{" "}
-          <a
-            href="/"
-            className="text-blue-500 hover:underline hover:text-blue-600"
-          >
-            Login
-          </a>
-        </p>
       </div>
     </div>
   );
 };
 
-export default Register;
+export default UserModal;
