@@ -8,7 +8,7 @@ const Register = () => {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [errors, setErrors] = useState({ name: "", email: "", password: "" });
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Use navigate hook
+  const navigate = useNavigate(); 
 
   const { isLoading, error } = useSelector((state) => state.auth);
 
@@ -53,7 +53,7 @@ const Register = () => {
           icon: "success",
           confirmButtonText: "Go to Login",
         }).then(() => {
-          navigate("/"); // Redirect to login
+          navigate("/"); 
         });
       }
     }
