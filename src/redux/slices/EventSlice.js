@@ -25,7 +25,19 @@ export const createEvent = createAsyncThunk(
             return rejectWithValue(error.response ? error.response.data : 'An error occurred');
         }
     }
-)
+);
+
+export const updateEvent = createAsyncThunk(
+    'events/update',
+    async ({ id, formData }, { rejectWithValue }) => {
+      try {
+        const response = await EventsService.updateEvent(id, formData); 
+        return  response ;
+      } catch (error) {
+        return rejectWithValue(error.response ? error.response.data : 'An error occurred');
+      }
+    }
+  );
 
 const initialState = {
     events: [],
@@ -63,7 +75,22 @@ const eventsSlice = createSlice({
             .addCase(createEvent.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-            });
+            })
+            .addCase(updateEvent.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+              })
+              .addCase(updateEvent.fulfilled, (state, action) => {
+                state.loading = false;
+                const { id, data } = action.payload;
+                state.events = state.events.map((event) =>
+                  event.id === id ? { ...event, ...data } : event
+                );
+              })
+              .addCase(updateEvent.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+              });
     }
 });
 
