@@ -22,7 +22,18 @@ createEvent:async (formdata)=>{
         
         return response.data; 
       } catch (error) {
-        console.error('Login failed:', error);
+        console.error('create event  failed:', error);
+        throw error; 
+      }
+},
+updateEvent:async (id,formdata)=>{
+    try {
+        const response = await axiosInstance.patch(`/events/${id}`,formdata);
+       
+        
+        return response.data; 
+      } catch (error) {
+        console.error('updating events failed:', error);
         throw error; 
       }
 }
