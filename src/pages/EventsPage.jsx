@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllEvents, createEvent, updateEvent } from "../redux/slices/EventSlice";
+import { getAllEvents, createEvent, updateEvent, deleteEvent } from "../redux/slices/EventSlice";
 import EventModal from "../components/EventModal";
-
+import Swal from 'sweetalert2';
 const EventPage = () => {
   const dispatch = useDispatch();
   const { events, loading, error } = useSelector((state) => state.events);
@@ -27,30 +27,80 @@ const EventPage = () => {
 
   const handleModalSubmit = (eventData) => {
     if (currentEvent) {
-        
-        dispatch(updateEvent({ id: currentEvent._id, formData: eventData }))
+      dispatch(updateEvent({ id: currentEvent._id, formData: eventData }))
         .unwrap()
         .then(() => {
-          dispatch(getAllEvents()); 
+          dispatch(getAllEvents());
+          Swal.fire(
+            'Updated!',
+            'Your event has been updated successfully.',
+            'success'
+          );
         })
         .catch((err) => {
           console.error("Failed to update event:", err);
+          Swal.fire(
+            'Error!',
+            'There was an issue updating the event.',
+            'error'
+          );
         });
     } else {
       dispatch(createEvent(eventData))
         .unwrap()
         .then(() => {
           dispatch(getAllEvents());
+          Swal.fire(
+            'Created!',
+            'Your event has been created successfully.',
+            'success'
+          );
         })
         .catch((err) => {
           console.error("Failed to create event:", err);
+          Swal.fire(
+            'Error!',
+            'There was an issue creating the event.',
+            'error'
+          );
         });
     }
     handleCloseModal();
   };
 
+
   const handleDelete = (id) => {
-    console.log("Deleting event:", id);
+    
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "This event will be deleted permanently!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, cancel!',
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(deleteEvent(id))
+          .unwrap()
+          .then(() => {
+            dispatch(getAllEvents()); 
+            Swal.fire(
+              'Deleted!',
+              'Your event has been deleted.',
+              'success'
+            );
+          })
+          .catch((err) => {
+            console.error("Failed to delete event:", err);
+            Swal.fire(
+              'Error!',
+              'There was an issue deleting the event.',
+              'error'
+            );
+          });
+      }
+    });
   };
 
   if (loading) {
@@ -102,7 +152,7 @@ const EventPage = () => {
                   <FaEdit />
                 </button>
                 <button
-                  onClick={() => handleDelete(event.id)}
+                  onClick={() => handleDelete(event._id)}
                   className="text-red-500 hover:text-red-600"
                 >
                   <FaTrashAlt />
