@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllEvents, createEvent } from "../redux/slices/EventSlice";
+import { getAllEvents, createEvent, updateEvent } from "../redux/slices/EventSlice";
 import EventModal from "../components/EventModal";
 
 const EventPage = () => {
@@ -27,10 +27,16 @@ const EventPage = () => {
 
   const handleModalSubmit = (eventData) => {
     if (currentEvent) {
-      // Dispatch update event action
-      console.log("Updating event:", eventData);
+        
+        dispatch(updateEvent({ id: currentEvent._id, formData: eventData }))
+        .unwrap()
+        .then(() => {
+          dispatch(getAllEvents()); 
+        })
+        .catch((err) => {
+          console.error("Failed to update event:", err);
+        });
     } else {
-      // Dispatch create event action
       dispatch(createEvent(eventData))
         .unwrap()
         .then(() => {
@@ -44,7 +50,6 @@ const EventPage = () => {
   };
 
   const handleDelete = (id) => {
-    // Dispatch delete event action
     console.log("Deleting event:", id);
   };
 
