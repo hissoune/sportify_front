@@ -1,27 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllParticipants } from "../redux/slices/ParticipantsSlice";
 
 const UsersPage = () => {
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john.doe@example.com",
-      role: "Admin",
-      profilePicture: "https://via.placeholder.com/100",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane.smith@example.com",
-      role: "User",
-      profilePicture: "https://via.placeholder.com/100",
-    },
-  ]);
+  const dispatch = useDispatch();
+  const { participants, loading, error } = useSelector((state) => state.participants);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    dispatch(getAllParticipants());
+  }, [dispatch]);
 
   const handleOpenModal = (user = null) => {
     setCurrentUser(user);
@@ -41,9 +33,17 @@ const UsersPage = () => {
     setShowModal(false);
   };
 
-  const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredParticipants = participants.filter((participant) =>
+    participant.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className="container mx-auto p-6">
@@ -66,20 +66,20 @@ const UsersPage = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredUsers.map((user) => (
-          <div key={user.id} className="bg-white shadow-lg rounded-lg p-6">
+        {filteredParticipants?.map((user) => (
+          <div key={user._id} className="bg-white shadow-lg rounded-lg p-6 flex flex-col">
             <div className="flex items-center mb-4">
               <img
-                src={user.profilePicture}
+                src="https://i.pinimg.com/736x/03/eb/d6/03ebd625cc0b9d636256ecc44c0ea324.jpg"
                 alt={user.name}
                 className="w-16 h-16 rounded-full border mr-4"
               />
               <div>
                 <h2 className="text-xl font-semibold">{user.name}</h2>
-                <p className="text-gray-600">{user.email}</p>
+                <p className="text-gray-600 truncate">{user.email}</p> {/* Ensure email is wrapped within the card */}
                 <span
                   className={`inline-block px-2 py-1 mt-1 rounded-full text-sm ${
-                    user.role === "Admin"
+                    user.role === "organizer"
                       ? "bg-red-100 text-red-600"
                       : "bg-blue-100 text-blue-600"
                   }`}
