@@ -8,11 +8,9 @@ const ProtectedRoute = ({ children,role }) => {
   if (!user) {
     return <Navigate to="/" replace />;
   }
-  console.log(role);
   
 
   if (role) {
-  console.log(user?.role);
   
     return user?.role === role?  children :  <Navigate to="/register" replace />;
   }
