@@ -17,6 +17,8 @@ export const getAllEvents = createAsyncThunk(
 export const createEvent = createAsyncThunk(
     'events/create',
     async (formdata,{ rejectWithValue })=>{
+        console.log(formdata);
+        
         try {
             const response = await EventsService.createEvent(formdata); 
             return response; 
