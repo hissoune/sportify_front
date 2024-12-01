@@ -7,7 +7,9 @@ import UserModal from "../components/UserModal";
 const UsersPage = () => {
   const dispatch = useDispatch();
   const { participants, loading, error } = useSelector((state) => state.participants);
-
+  
+  console.log('pararar',participants);
+  
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
