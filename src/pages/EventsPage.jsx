@@ -36,8 +36,8 @@ const EventPage = () => {
     setShowModal(false);
     setCurrentEvent(null);
   };
-  const handleNavigateToSinglePage = (event) => {
-    navigate('/dashboard/single-event', { state: { event } });
+  const handleNavigateToSinglePage = (oneevent) => {
+    navigate('/dashboard/single-event', { state: { oneevent } });
   };
   const handleModalSubmit = (eventData) => {
     console.log("handeled data",eventData);
@@ -143,12 +143,13 @@ const EventPage = () => {
           <div
             key={event._id}
             className="bg-white shadow-lg rounded-lg overflow-hidden transform transition-all hover:scale-105 cursor-pointer"
-            onClick={() => handleNavigateToSinglePage(event)}
           >
             <img
               src={event.imagePath}
               alt={event.name}
               className="w-full h-40 object-cover"
+              onClick={() => handleNavigateToSinglePage(event)}
+
             />
             <div className="p-4">
               <h2 className="text-xl font-semibold mb-2">{event.name}</h2>
