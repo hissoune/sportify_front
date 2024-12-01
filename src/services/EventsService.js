@@ -48,7 +48,30 @@ delteEvent:async (id)=>{
         console.error('deleting  events failed:', error);
         throw error; 
       }
-}
+},
+getEventById:async (id)=>{
+    try {
+        const response = await axiosInstance.get(`/events/${id}`);
+        return response.data; 
+      } catch (error) {
+        console.error('Login failed:', error);
+        throw error; 
+      }
+},
+removeParticipant: async (participantId, eventId) => {
+    console.log('Participant ID:', participantId);
+    const id = eventId;
+    try {
+      const response = await axiosInstance.delete(`/events/removeParticipant/${id}`, {
+        data: { participantId: participantId },  
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Deleting participant failed:', error);
+      throw error;
+    }
+  }
+  
 
 }
 export default EventsService;

@@ -54,6 +54,34 @@ export const updateEvent = createAsyncThunk(
         }
     }
 );
+export const getEventById = createAsyncThunk(
+    'events/getEventById', 
+    async (id, { rejectWithValue }) => {
+        try {
+            const response = await EventsService.getEventById(id); 
+            return response; 
+        } catch (error) {
+      
+            return rejectWithValue(error.response ? error.response.data : 'An error occurred');
+        }
+    }
+)
+
+export const removeParticipant = createAsyncThunk(
+    'events/removeparticipant',
+    async ({participantId,eventId}, { rejectWithValue }) => {
+        console.log('parra',participantId);
+        
+        try {
+            const response = await EventsService.removeParticipant(participantId,eventId);
+            console.log(response);
+             
+            return response; 
+        } catch (error) {
+            return rejectWithValue(error.response ? error.response.data : 'An error occurred');
+        }
+    }
+)
 
 const initialState = {
     events: [],
@@ -107,6 +135,40 @@ const eventsSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
               })
+              .addCase(getEventById.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getEventById.fulfilled, (state, action) => {
+                state.loading = false;
+                state.event = action.payload;  
+            })
+            .addCase(getEventById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(removeParticipant.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(removeParticipant.fulfilled, (state, action) => {
+                state.loading = false;
+                const { participantId, eventId } = action.payload;
+                
+                if (state.event.id === eventId) {
+                    state.event.participants = state.event.participants.filter(p => p.id !== participantId);
+                } else {
+                    state.events = state.events.map((event) =>
+                        event.id === eventId
+                            ? { ...event, participants: event.participants.filter(p => p.id !== participantId) }
+                            : event
+                    );
+                }
+            })
+            .addCase(removeParticipant.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
               .addCase(deleteEvent.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -118,7 +180,8 @@ const eventsSlice = createSlice({
             .addCase(deleteEvent.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-            });
+            })
+            
     }
 });
 
