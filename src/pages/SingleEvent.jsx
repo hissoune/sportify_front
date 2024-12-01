@@ -1,13 +1,34 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { FaTrashAlt } from 'react-icons/fa'; 
+import { useDispatch, useSelector } from 'react-redux';
+import { getEventById, removeParticipant } from '../redux/slices/EventSlice';
+import Swal from 'sweetalert2';
 
 const SingleEvent = () => {
   const { state } = useLocation();
-  const { event } = state || {}; 
+  const { oneevent } = state || {};
+  
+  const dispatch = useDispatch(); 
+  useEffect(() => {
+    if (oneevent && oneevent._id) {
+      dispatch(getEventById(oneevent._id));
+    }
+  }, [dispatch, oneevent]);
 
-  if (!event) {
-    return <div>Event not found</div>;
+  const { event, loading, error } = useSelector((state) => state.events);
+  
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  if (!event || !event.participants) {
+    return <div>Event not found or participants not available</div>;
   }
 
   const formatDate = (dateString) => {
@@ -20,9 +41,41 @@ const SingleEvent = () => {
     });
   };
 
-  const handleRemoveParticipant = (participantId,eventId) => {
-    console.log("Removing participant with id:", participantId);
-    console.log("Removing event with id:", eventId);
+  const handleRemoveParticipant = (participantId, eventId) =>{
+    console.log(eventId);
+    
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "This participant will be deleted permanently!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          dispatch(removeParticipant({participantId,eventId}))
+            .unwrap()
+            .then(() => {
+                dispatch(getEventById(oneevent._id));
+
+              Swal.fire(
+                'Deleted!',
+                'Your participant has been deleted.',
+                'success'
+              );
+            })
+            .catch((err) => {
+              console.error("Failed to delete participant:", err);
+              Swal.fire(
+                'Error!',
+                'There was an issue deleting the participant.',
+                'error'
+              );
+            });
+        }
+      });
+    
   };
 
   return (
@@ -65,7 +118,7 @@ const SingleEvent = () => {
                     <td className="px-4 py-2">{participant.email}</td>
                     <td className="px-4 py-2">
                       <button
-                        onClick={() => handleRemoveParticipant(participant._id ,event._id)}
+                        onClick={() => handleRemoveParticipant(participant._id, event._id)}
                         className="text-red-500 hover:text-red-700"
                       >
                         <FaTrashAlt />
