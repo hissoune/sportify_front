@@ -31,6 +31,19 @@ export const createParticipant = createAsyncThunk(
     }
   );
 
+  export const updateParticipant =createAsyncThunk(
+    'participant/update',
+    async ({ id, formData }, { rejectWithValue })=>{
+        try {
+            const response = await ParticipantService.updateParticipant(id, formData); 
+            return  response ;
+          } catch (error) {
+            return rejectWithValue(error.response ? error.response.data : 'An error occurred');
+          }
+
+    }
+  )
+
 const initialState = {
   participants: [],
   participant: {}, 
@@ -71,7 +84,23 @@ const participantSlice = createSlice({
       .addCase(createParticipant.rejected, (state, action) => {
         state.createLoading = false;
         state.createError = action.payload; 
-      });
+      })
+      .addCase(updateParticipant.pending, (state)=>{
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateParticipant.fulfilled, (state,action)=>{
+        state.loading = false;
+        const { id, data } = action.payload;
+        state.participants = state.participants.map((participant) => 
+            participant._id === id ? { ...participant, ...data } : participant
+          );
+          
+      })
+      .addCase(updateParticipant.rejected, (state,action)=>{
+        state.loading = false;
+        state.error = action.payload;
+      })
   },
 });
 
