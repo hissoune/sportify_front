@@ -4,8 +4,11 @@ import ParticipantService from '../../services/ParticipantService';
 export const getAllParticipants = createAsyncThunk(
   'participants/getAll', 
   async (_, { rejectWithValue }) => {
+    
     try {
       const response = await ParticipantService.getAllParticipants();
+      console.log(response);
+      
       return response; 
     } catch (error) {
       return rejectWithValue(error.response ? error.response.data : 'An error occurred');
