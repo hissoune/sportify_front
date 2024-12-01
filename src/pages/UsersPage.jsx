@@ -23,6 +23,7 @@ const UsersPage = () => {
     setCurrentUser(user);
     setShowModal(true);
   };
+  
 
   const handleDelete = (id) => {
     Swal.fire({

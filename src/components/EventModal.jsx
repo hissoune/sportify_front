@@ -28,7 +28,7 @@ const EventModal = ({ isOpen, onClose, onSubmit, currentEvent }) => {
             ? new Date(currentEvent.date).toISOString().split("T")[0]
             : "",
           location: currentEvent.location || "",
-          participants: currentEvent.participants || [], // Assume already an array of IDs
+          participants: currentEvent.participants || [], 
           image: null,
         });
       } else {
@@ -53,7 +53,6 @@ const EventModal = ({ isOpen, onClose, onSubmit, currentEvent }) => {
     };
   
     const handleParticipantsChange = (selectedOptions) => {
-      // Extract only IDs from selected options
       const ids = selectedOptions.map((option) => option.value);
       setFormData((prev) => ({ ...prev, participants: ids }));
     };
@@ -69,7 +68,6 @@ const EventModal = ({ isOpen, onClose, onSubmit, currentEvent }) => {
   
     if (!isOpen) return null;
   
-    // Transform participants from Redux to options for the select component
     const participantOptions = participants.map((participant) => ({
       value: participant._id,
       label: participant.name,

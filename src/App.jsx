@@ -9,6 +9,7 @@ import UsersPage from "./pages/UsersPage"
 import Home from "./pages/Home"
 import Events from "./pages/Events"
 import ParticipantDashboard from "./pages/ParticipantDashboard"
+import SingleEvent from "./pages/SingleEvent"
 
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
       <Route  path='/dashboard' element={<ProtectedRoute role='organizer'><Dashboard /></ProtectedRoute>}>
        <Route index element={<ProtectedRoute role='organizer'><Statistics/></ProtectedRoute>} />
        <Route  path="/dashboard/events" element={<ProtectedRoute role='organizer'><EventPage /></ProtectedRoute>} />
+       <Route  path="/dashboard/single-event" element={<ProtectedRoute role='organizer'><SingleEvent /></ProtectedRoute>} />
        <Route  path="/dashboard/users" element={<ProtectedRoute role='organizer'><UsersPage /></ProtectedRoute>} />
       </Route>
       <Route path='/home' element={<ProtectedRoute ><Home/></ProtectedRoute>} >
