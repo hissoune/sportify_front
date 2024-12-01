@@ -17,6 +17,7 @@ getAllEvents:async () =>{
 
 createEvent:async (formdata)=>{
     try {
+        console.log(formdata)
         const response = await axiosInstance.post('/events',formdata);
        
         
