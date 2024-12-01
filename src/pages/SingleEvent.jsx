@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { FaTrashAlt } from 'react-icons/fa'; 
+import { FaTrashAlt } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { getEventById, removeParticipant } from '../redux/slices/EventSlice';
 import Swal from 'sweetalert2';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const SingleEvent = () => {
   const { state } = useLocation();
@@ -21,7 +23,6 @@ const SingleEvent = () => {
   if (loading) {
     return <div>Loading...</div>;
   }
-  
 
   if (error) {
     return <div>Error: {error}</div>;
@@ -41,46 +42,65 @@ const SingleEvent = () => {
     });
   };
 
-  const handleRemoveParticipant = (participantId, eventId) =>{
-    console.log(eventId);
-    
+  const handleRemoveParticipant = (participantId, eventId) => {
     Swal.fire({
-        title: 'Are you sure?',
-        text: "This participant will be deleted permanently!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, cancel!',
-        reverseButtons: true,
-      }).then((result) => {
-        if (result.isConfirmed) {
-          dispatch(removeParticipant({participantId,eventId}))
-            .unwrap()
-            .then(() => {
-                dispatch(getEventById(oneevent._id));
-
-              Swal.fire(
-                'Deleted!',
-                'Your participant has been deleted.',
-                'success'
-              );
-            })
-            .catch((err) => {
-              console.error("Failed to delete participant:", err);
-              Swal.fire(
-                'Error!',
-                'There was an issue deleting the participant.',
-                'error'
-              );
-            });
-        }
-      });
-    
+      title: 'Are you sure?',
+      text: "This participant will be deleted permanently!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, cancel!',
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(removeParticipant({participantId, eventId}))
+          .unwrap()
+          .then(() => {
+            dispatch(getEventById(oneevent._id));
+            Swal.fire('Deleted!', 'Your participant has been deleted.', 'success');
+          })
+          .catch((err) => {
+            console.error("Failed to delete participant:", err);
+            Swal.fire('Error!', 'There was an issue deleting the participant.', 'error');
+          });
+      }
+    });
   };
+
+  const downloadPDF = () => {
+    const eventCard = document.getElementById('event-card');
+    const deleteButtons = eventCard.querySelectorAll('.delete-btn');
+    deleteButtons.forEach(button => button.style.display = 'none'); 
+    
+    html2canvas(eventCard, {
+      scale: 2, 
+      useCORS: true,
+      logging: false, 
+      letterRendering: 1 
+    }).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
+      
+      const doc = new jsPDF({
+        orientation: 'portrait', 
+        unit: 'mm', 
+        format: 'a4',
+      });
+  
+      const margin = 10; 
+      const imgWidth = 180; 
+      const imgHeight = (canvas.height * imgWidth) / canvas.width; 
+  
+      doc.addImage(imgData, 'PNG', margin, margin, imgWidth, imgHeight);
+      doc.save(`${event.name}_event_card.pdf`);
+  
+      deleteButtons.forEach(button => button.style.display = 'inline-block');
+    });
+  };
+  
 
   return (
     <div className="container mx-auto p-6">
-      <div className="bg-white shadow-lg rounded-lg overflow-hidden mb-6">
+      <div className="bg-white shadow-lg rounded-lg overflow-hidden mb-6" id="event-card">
         <img
           src={event.imagePath}
           alt={event.name}
@@ -119,7 +139,7 @@ const SingleEvent = () => {
                     <td className="px-4 py-2">
                       <button
                         onClick={() => handleRemoveParticipant(participant._id, event._id)}
-                        className="text-red-500 hover:text-red-700"
+                        className="text-red-500 hover:text-red-700 delete-btn"
                       >
                         <FaTrashAlt />
                       </button>
@@ -130,6 +150,12 @@ const SingleEvent = () => {
             </table>
           </div>
         </div>
+        <button
+          onClick={downloadPDF}
+          className="delete-btn mt-4 px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+        >
+          Download PDF
+        </button>
       </div>
     </div>
   );
