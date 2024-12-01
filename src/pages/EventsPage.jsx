@@ -4,12 +4,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllEvents, createEvent, updateEvent, deleteEvent } from "../redux/slices/EventSlice";
 import EventModal from "../components/EventModal";
 import Swal from 'sweetalert2';
+import { useNavigate } from "react-router-dom";
 const EventPage = () => {
   const dispatch = useDispatch();
   const { events, loading, error } = useSelector((state) => state.events);
 
   const [showModal, setShowModal] = useState(false);
   const [currentEvent, setCurrentEvent] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(getAllEvents());
@@ -20,11 +22,23 @@ const EventPage = () => {
     setShowModal(true);
   };
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric', 
+    });
+  };
+
   const handleCloseModal = () => {
     setShowModal(false);
     setCurrentEvent(null);
   };
-
+  const handleNavigateToSinglePage = (event) => {
+    navigate('/dashboard/single-event', { state: { event } });
+  };
   const handleModalSubmit = (eventData) => {
     console.log("handeled data",eventData);
     
@@ -128,7 +142,8 @@ const EventPage = () => {
         {events?.map((event) => (
           <div
             key={event._id}
-            className="bg-white shadow-lg rounded-lg overflow-hidden"
+            className="bg-white shadow-lg rounded-lg overflow-hidden transform transition-all hover:scale-105 cursor-pointer"
+            onClick={() => handleNavigateToSinglePage(event)}
           >
             <img
               src={event.imagePath}
@@ -138,7 +153,7 @@ const EventPage = () => {
             <div className="p-4">
               <h2 className="text-xl font-semibold mb-2">{event.name}</h2>
               <p className="text-gray-600 mb-1">
-                <strong>Date:</strong> {event.date}
+                <strong>Date:</strong> {formatDate(event.date)}
               </p>
               <p className="text-gray-600 mb-1">
                 <strong>Location:</strong> {event.location}
