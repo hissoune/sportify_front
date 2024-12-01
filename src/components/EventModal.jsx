@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
-import { useDispatch, useSelector } from "react-redux";
-import { getAllParticipants } from "../redux/slices/ParticipantsSlice";
+
 import Swal from "sweetalert2";
 
 const EventModal = ({ isOpen, onClose, onSubmit, currentEvent }) => {
@@ -121,14 +120,17 @@ const EventModal = ({ isOpen, onClose, onSubmit, currentEvent }) => {
           </div>
           <div className="mb-4">
             <label htmlFor="participants" className="block text-sm font-semibold">
-              Members (comma-separated)
+              Members 
             </label>
-            <input
-              type="text"
+            <Select
+              isMulti
               name="participants"
-              value={formData.participants}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg"
+              value={formData.participants.map((participantId) => 
+                formData.participants.find(option => option.value === participantId)
+              )}
+              onChange={handleParticipantsChange}
+              options={participantOptions}
+              className="w-full"
             />
           </div>
           <div className="mb-4">
