@@ -25,6 +25,18 @@ createParticipant:async (formData)=>{
         console.error('creating user failed:', error);
         throw error; 
       }
+},
+
+updateParticipant:async (id,formData)=>{
+    try {
+        const response = await axiosInstance.patch(`/users/${id}`,formData);
+       
+        
+        return response.data; 
+      } catch (error) {
+        console.error('creating user failed:', error);
+        throw error; 
+      }
 }
 
 
