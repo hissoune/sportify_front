@@ -159,6 +159,7 @@ const EventModal = ({ isOpen, onClose, onSubmit, currentEvent }) => {
           </div>
         </form>
       </div>
+      </div>
     );
   };
   
