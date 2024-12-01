@@ -42,6 +42,18 @@ export const createParticipant = createAsyncThunk(
           }
 
     }
+  );
+
+  export const deleteParticipant = createAsyncThunk(
+    'participants/delete',
+    async (id, { rejectWithValue }) => {
+        try {
+            const response = await ParticipantService.deleteParticipant(id); 
+            return id; 
+        } catch (error) {
+            return rejectWithValue(error.response ? error.response.data : 'An error occurred');
+        }
+    }
   )
 
 const initialState = {
@@ -98,6 +110,18 @@ const participantSlice = createSlice({
           
       })
       .addCase(updateParticipant.rejected, (state,action)=>{
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteParticipant.pending, (state)=>{
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteParticipant.fulfilled, (state,action)=>{
+        state.loading = false;
+        state.participants = state.participants.filter(participant => participant.id !== action.payload);
+      })
+      .addCase(deleteParticipant.rejected, (state,action)=>{
         state.loading = false;
         state.error = action.payload;
       })
