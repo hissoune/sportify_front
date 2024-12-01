@@ -26,6 +26,8 @@ const EventPage = () => {
   };
 
   const handleModalSubmit = (eventData) => {
+    console.log("handeled data",eventData);
+    
     if (currentEvent) {
       dispatch(updateEvent({ id: currentEvent._id, formData: eventData }))
         .unwrap()
@@ -142,14 +144,15 @@ const EventPage = () => {
                 <strong>Location:</strong> {event.location}
               </p>
               <p className="text-gray-600 mb-4">
-                <strong>Members:</strong> {event.participants.join(", ")}
+              
+                <strong>Members: </strong> {event.participants.length}
               </p>
               <div className="flex justify-between">
                 <button
                   onClick={() => handleOpenModal(event)}
                   className="text-yellow-500 hover:text-yellow-600"
                 >
-                  <FaEdit />
+                  <FaEdit /> 
                 </button>
                 <button
                   onClick={() => handleDelete(event._id)}

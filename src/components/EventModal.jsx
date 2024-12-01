@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import Select from "react-select";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllParticipants } from "../redux/slices/ParticipantsSlice";
 import Swal from "sweetalert2";
 
 const EventModal = ({ isOpen, onClose, onSubmit, currentEvent }) => {
@@ -156,8 +159,8 @@ const EventModal = ({ isOpen, onClose, onSubmit, currentEvent }) => {
           </div>
         </form>
       </div>
-    </div>
-  );
-};
-
-export default EventModal;
+    );
+  };
+  
+  export default EventModal;
+  

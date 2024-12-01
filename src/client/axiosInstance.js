@@ -12,7 +12,7 @@ axiosInstance.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    if (config.data instanceof FormData) {
+    if (config.data?.image) {
       config.headers['Content-Type'] = 'multipart/form-data';
     } else {
       config.headers['Content-Type'] = 'application/json';

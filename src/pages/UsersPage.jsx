@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllParticipants } from "../redux/slices/ParticipantsSlice";
+import { deleteParticipant, getAllParticipants } from "../redux/slices/ParticipantsSlice";
 import UserModal from "../components/UserModal";
+import Swal from "sweetalert2";
 
 const UsersPage = () => {
   const dispatch = useDispatch();
   const { participants, loading, error } = useSelector((state) => state.participants);
-
+  
+  console.log('pararar',participants);
+  
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -22,6 +25,37 @@ const UsersPage = () => {
   };
 
   const handleDelete = (id) => {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "This participant will be deleted permanently!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          dispatch(deleteParticipant(id))
+            .unwrap()
+            .then(() => {
+              dispatch(getAllParticipants()); 
+              Swal.fire(
+                'Deleted!',
+                'Your participant has been deleted.',
+                'success'
+              );
+            })
+            .catch((err) => {
+              console.error("Failed to delete participant:", err);
+              Swal.fire(
+                'Error!',
+                'There was an issue deleting the participant.',
+                'error'
+              );
+            });
+        }
+      });
+    
   };
 
   const filteredParticipants = participants.filter((participant) =>
