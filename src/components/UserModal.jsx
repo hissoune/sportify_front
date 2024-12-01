@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { createParticipant } from "../redux/slices/ParticipantsSlice";
+import { createParticipant, getAllParticipants, updateParticipant } from "../redux/slices/ParticipantsSlice";
 import Swal from "sweetalert2";
 
 const UserModal = ({ currentUser, closeModal }) => {
@@ -8,19 +8,17 @@ const UserModal = ({ currentUser, closeModal }) => {
   const [errors, setErrors] = useState({ name: "", email: "", password: "" });
   const dispatch = useDispatch();
 
-  // Prefill form if editing an existing user
   useEffect(() => {
     if (currentUser) {
       setForm({
         name: currentUser.name || "",
         email: currentUser.email || "",
-        password: "", // Keep password empty for security
+        password: "",
       });
       setErrors({ name: "", email: "", password: "" });
     }
   }, [currentUser]);
 
-  // Validation functions
   const validateEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   const validatePassword = (value) =>
     value.length >= 6 ? "" : "Password must be at least 6 characters.";
@@ -52,29 +50,58 @@ const UserModal = ({ currentUser, closeModal }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  console.log(form)
-    // Check if there are no errors
-    if (!errors.name && !errors.email && !errors.password) {
-      const actionPayload = { ...form }; 
-      console.log(actionPayload);
-      
-      const action = createParticipant(actionPayload);
-      const result = await dispatch(action);
   
-      if (createParticipant.fulfilled.match(result)) {
-        Swal.fire({
-          title: currentUser ? "User Updated!" : "User Created!",
-          text: currentUser
-            ? `${form.name}'s information has been updated.`
-            : `User ${form.name} has been successfully created.`,
-          icon: "success",
-          confirmButtonText: "Close",
-        }).then(() => {
-          closeModal(); 
-        });
+    if (!errors.name && !errors.email && (!currentUser || !errors.password)) {
+      if (currentUser) {
+        const actionPayload = { id: currentUser._id, formData: form }; 
+        const action = updateParticipant(actionPayload);
+        const result = await dispatch(action);
+  
+        if (updateParticipant.fulfilled.match(result)) {
+          Swal.fire({
+            title: "User Updated!",
+            text: `${form.name}'s information has been updated.`,
+            icon: "success",
+            confirmButtonText: "Close",
+          }).then(() => {
+            dispatch(getAllParticipants());
+            closeModal(); 
+          });
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: "Failed to update user. Please try again.",
+            icon: "error",
+            confirmButtonText: "Close",
+          });
+        }
+      } else {
+        const actionPayload = { ...form }; 
+        const action = createParticipant(actionPayload);
+        const result = await dispatch(action);
+  
+        if (createParticipant.fulfilled.match(result)) {
+          Swal.fire({
+            title: "User Created!",
+            text: `User ${form.name} has been successfully created.`,
+            icon: "success",
+            confirmButtonText: "Close",
+          }).then(() => {
+            dispatch(getAllParticipants());
+            closeModal(); 
+          });
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: "Failed to create user. Please try again.",
+            icon: "error",
+            confirmButtonText: "Close",
+          });
+        }
       }
     }
   };
+  
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
