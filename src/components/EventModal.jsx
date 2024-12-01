@@ -60,12 +60,10 @@ const EventModal = ({ isOpen, onClose, onSubmit, currentEvent }) => {
   
     const handleSubmit = (e) => {
       e.preventDefault();
-      // Ensure only IDs are submitted for participants
       const finalData = {
         ...formData,
         participants: formData.participants,
       };
-      console.log(finalData);
       onSubmit(finalData);
     };
   
