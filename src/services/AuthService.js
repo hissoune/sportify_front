@@ -13,9 +13,9 @@ const AuthService = {
           throw error; 
         }
       },
-      register:async (name,email,password) =>{
+      register:async (formdata) =>{        
         try {
-            const response= await  axiosInstance.post('/auth/register' ,{name,email,password});
+            const response= await  axiosInstance.post('/auth/register' ,formdata);
            
             
             return  response.data;
