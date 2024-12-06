@@ -8,14 +8,19 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    dispatch(logout());
-    navigate("/login");
-  };
+        dispatch(logout());
+        navigate("/login");
+      };
 
   return (
     <nav className="bg-gradient-to-r from-blue-500 to-green-500 text-white py-4 shadow-lg">
       <div className="container mx-auto flex justify-between items-center">
-        <h1 className="text-3xl font-extrabold text-white">Event App</h1>
+        <div>
+            <h1 className="text-3xl font-extrabold text-white">
+         <img src="/2bed3446db10b86af56e902479b3a9df-removebg-preview.png" alt="" />
+      </h1>
+        </div>
+        
         <ul className="flex space-x-8">
           <li>
             <Link

@@ -5,10 +5,16 @@ import Swal from "sweetalert2"; // Import SweetAlert2
 import { useNavigate } from "react-router-dom"; // For navigation
 
 const Register = () => {
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    gender: "",
+    role: "",
+  });
   const [errors, setErrors] = useState({ name: "", email: "", password: "" });
   const dispatch = useDispatch();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const { isLoading, error } = useSelector((state) => state.auth);
 
@@ -16,6 +22,11 @@ const Register = () => {
 
   const validatePassword = (value) =>
     value.length >= 6 ? "" : "Password must be at least 6 characters.";
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setForm((prev) => ({ ...prev, image: file }));
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -42,6 +53,14 @@ const Register = () => {
     }
   };
 
+  const handleSelectChange = (e) => {
+    setForm({ ...form, gender: e.target.value });
+  };
+
+  const handleRoleSelectChange = (e) => {
+    setForm({ ...form, role: e.target.value });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!errors.name && !errors.email && !errors.password) {
@@ -53,7 +72,7 @@ const Register = () => {
           icon: "success",
           confirmButtonText: "Go to Login",
         }).then(() => {
-          navigate("/"); 
+          navigate("/");
         });
       }
     }
@@ -63,11 +82,16 @@ const Register = () => {
     <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-500 to-indigo-800">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
         <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-6">
-          <img src="/2bed3446db10b86af56e902479b3a9df-removebg-preview.png" alt="" />
+          <img
+            src="/2bed3446db10b86af56e902479b3a9df-removebg-preview.png"
+            alt=""
+          />
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-600">Name</label>
+            <label className="block text-sm font-semibold text-gray-600">
+              Name
+            </label>
             <input
               type="text"
               name="name"
@@ -84,7 +108,9 @@ const Register = () => {
             )}
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-600">Email Address</label>
+            <label className="block text-sm font-semibold text-gray-600">
+              Email Address
+            </label>
             <input
               type="email"
               name="email"
@@ -101,7 +127,9 @@ const Register = () => {
             )}
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-600">Password</label>
+            <label className="block text-sm font-semibold text-gray-600">
+              Password
+            </label>
             <input
               type="password"
               name="password"
@@ -116,6 +144,53 @@ const Register = () => {
             {errors.password && (
               <p className="text-sm text-red-500 mt-1">{errors.password}</p>
             )}
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-gray-600">
+              Gender
+            </label>
+            <select
+              name="gender"
+              value={form.gender}
+              onChange={handleSelectChange}
+              className="w-full px-4 py-2 border rounded-lg"
+              required
+            >
+              <option value="" disabled>
+                Select Gender
+              </option>
+              <option value="man">Man</option>
+              <option value="woman">Woman</option>
+            </select>
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-gray-600">
+              what role you want ??
+            </label>
+            <select
+              name="role"
+              value={form.role}
+              onChange={handleRoleSelectChange}
+              className="w-full px-4 py-2 border rounded-lg"
+              required
+            >
+              <option value="" disabled>
+                Select role
+              </option>
+              <option value="participant">participant</option>
+              <option value="organizer">organizer</option>
+            </select>
+          </div>
+          <div className="mb-4">
+            <label htmlFor="image" className="block text-sm font-semibold">
+              Image
+            </label>
+            <input
+              type="file"
+              name="image"
+              onChange={handleFileChange}
+              className="w-full px-4 py-2 border rounded-lg"
+            />
           </div>
           <button
             type="submit"

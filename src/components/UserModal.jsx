@@ -14,6 +14,8 @@ const UserModal = ({ currentUser, closeModal }) => {
         name: currentUser.name || "",
         email: currentUser.email || "",
         password: "",
+        gender: "",
+        role: "",
       });
       setErrors({ name: "", email: "", password: "" });
     }
@@ -22,6 +24,13 @@ const UserModal = ({ currentUser, closeModal }) => {
   const validateEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   const validatePassword = (value) =>
     value.length >= 6 ? "" : "Password must be at least 6 characters.";
+
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setForm((prev) => ({ ...prev, image: file }));
+  };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,16 +56,22 @@ const UserModal = ({ currentUser, closeModal }) => {
         break;
     }
   };
+ const handleSelectChange = (e) => {
+    setForm({ ...form, gender: e.target.value });
+  };
 
+  const handleRoleSelectChange = (e) => {
+    setForm({ ...form, role: e.target.value });
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!errors.name && !errors.email && (!currentUser || !errors.password)) {
       if (currentUser) {
-        const actionPayload = { id: currentUser._id, formData: form }; 
+        const actionPayload = { id: currentUser._id, formData: form };
         const action = updateParticipant(actionPayload);
         const result = await dispatch(action);
-  
+
         if (updateParticipant.fulfilled.match(result)) {
           Swal.fire({
             title: "User Updated!",
@@ -65,7 +80,7 @@ const UserModal = ({ currentUser, closeModal }) => {
             confirmButtonText: "Close",
           }).then(() => {
             dispatch(getAllParticipants());
-            closeModal(); 
+            closeModal();
           });
         } else {
           Swal.fire({
@@ -76,10 +91,10 @@ const UserModal = ({ currentUser, closeModal }) => {
           });
         }
       } else {
-        const actionPayload = { ...form }; 
+        const actionPayload = { ...form };
         const action = createParticipant(actionPayload);
         const result = await dispatch(action);
-  
+
         if (createParticipant.fulfilled.match(result)) {
           Swal.fire({
             title: "User Created!",
@@ -88,7 +103,7 @@ const UserModal = ({ currentUser, closeModal }) => {
             confirmButtonText: "Close",
           }).then(() => {
             dispatch(getAllParticipants());
-            closeModal(); 
+            closeModal();
           });
         } else {
           Swal.fire({
@@ -101,7 +116,7 @@ const UserModal = ({ currentUser, closeModal }) => {
       }
     }
   };
-  
+
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
@@ -118,9 +133,8 @@ const UserModal = ({ currentUser, closeModal }) => {
               type="text"
               name="name"
               placeholder="Enter your full name"
-              className={`w-full px-4 py-2 border ${
-                errors.name ? "border-red-500" : "border-gray-300"
-              } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400`}
+              className={`w-full px-4 py-2 border ${errors.name ? "border-red-500" : "border-gray-300"
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400`}
               value={form.name}
               onChange={handleChange}
               required
@@ -137,9 +151,8 @@ const UserModal = ({ currentUser, closeModal }) => {
               type="email"
               name="email"
               placeholder="Enter your email"
-              className={`w-full px-4 py-2 border ${
-                errors.email ? "border-red-500" : "border-gray-300"
-              } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400`}
+              className={`w-full px-4 py-2 border ${errors.email ? "border-red-500" : "border-gray-300"
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400`}
               value={form.email}
               onChange={handleChange}
               required
@@ -156,9 +169,8 @@ const UserModal = ({ currentUser, closeModal }) => {
               type="password"
               name="password"
               placeholder="Create a password"
-              className={`w-full px-4 py-2 border ${
-                errors.password ? "border-red-500" : "border-gray-300"
-              } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400`}
+              className={`w-full px-4 py-2 border ${errors.password ? "border-red-500" : "border-gray-300"
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400`}
               value={form.password}
               onChange={handleChange}
               required={!currentUser} // Password required only for new users
@@ -166,6 +178,53 @@ const UserModal = ({ currentUser, closeModal }) => {
             {errors.password && (
               <p className="text-sm text-red-500 mt-1">{errors.password}</p>
             )}
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-gray-600">
+              Gender
+            </label>
+            <select
+              name="gender"
+              value={form.gender}
+              onChange={handleSelectChange}
+              className="w-full px-4 py-2 border rounded-lg"
+              required
+            >
+              <option value="" disabled>
+                Select Gender
+              </option>
+              <option value="man">Man</option>
+              <option value="woman">Woman</option>
+            </select>
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-gray-600">
+              what role you want ??
+            </label>
+            <select
+              name="role"
+              value={form.role}
+              onChange={handleRoleSelectChange}
+              className="w-full px-4 py-2 border rounded-lg"
+              required
+            >
+              <option value="" disabled>
+                Select role
+              </option>
+              <option value="participant">participant</option>
+              <option value="organizer">organizer</option>
+            </select>
+          </div>
+          <div className="mb-4">
+            <label htmlFor="image" className="block text-sm font-semibold">
+              Image
+            </label>
+            <input
+              type="file"
+              name="image"
+              onChange={handleFileChange}
+              className="w-full px-4 py-2 border rounded-lg"
+            />
           </div>
           <div className="flex justify-between">
             <button

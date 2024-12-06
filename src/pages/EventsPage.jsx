@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 const EventPage = () => {
   const dispatch = useDispatch();
   const { events, loading, error } = useSelector((state) => state.events);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const [showModal, setShowModal] = useState(false);
   const [currentEvent, setCurrentEvent] = useState(null);
@@ -25,10 +26,10 @@ const EventPage = () => {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric', 
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     });
   };
 
@@ -40,8 +41,8 @@ const EventPage = () => {
     navigate('/dashboard/single-event', { state: { oneevent } });
   };
   const handleModalSubmit = (eventData) => {
-    console.log("handeled data",eventData);
-    
+    console.log("handeled data", eventData);
+
     if (currentEvent) {
       dispatch(updateEvent({ id: currentEvent._id, formData: eventData }))
         .unwrap()
@@ -86,7 +87,7 @@ const EventPage = () => {
 
 
   const handleDelete = (id) => {
-    
+
     Swal.fire({
       title: 'Are you sure?',
       text: "This event will be deleted permanently!",
@@ -100,7 +101,7 @@ const EventPage = () => {
         dispatch(deleteEvent(id))
           .unwrap()
           .then(() => {
-            dispatch(getAllEvents()); 
+            dispatch(getAllEvents());
             Swal.fire(
               'Deleted!',
               'Your event has been deleted.',
@@ -119,6 +120,10 @@ const EventPage = () => {
     });
   };
 
+  const filteredEvents = events.filter((event) =>
+    event.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -130,16 +135,25 @@ const EventPage = () => {
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold text-center mb-6">Event Management</h1>
-      
-      <button
-        onClick={() => handleOpenModal()}
-        className="bg-blue-600 text-white px-4 py-2 rounded-lg mb-6 hover:bg-blue-700"
-      >
-        Create Event
-      </button>
+      <div className="flex justify-between mb-6">
+      <input
+          type="text"
+          placeholder="Search users..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full md:w-1/3 px-4 py-2 border rounded-lg shadow-sm"
+        />
+        <button
+          onClick={() => handleOpenModal()}
+          className="ml-4 bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transform transition-all hover:scale-105 cursor-pointer"
+        >
+          Create Event
+        </button>
+      </div>
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {events?.map((event) => (
+        {filteredEvents?.map((event) => (
           <div
             key={event._id}
             className="bg-white shadow-lg rounded-lg overflow-hidden transform transition-all hover:scale-105 cursor-pointer"
@@ -160,7 +174,7 @@ const EventPage = () => {
                 <strong>Location:</strong> {event.location}
               </p>
               <p className="text-gray-600 mb-4">
-              
+
                 <strong>Members: </strong> {event.participants.length}
               </p>
               <div className="flex justify-between">
@@ -168,7 +182,7 @@ const EventPage = () => {
                   onClick={() => handleOpenModal(event)}
                   className="text-yellow-500 hover:text-yellow-600"
                 >
-                  <FaEdit /> 
+                  <FaEdit />
                 </button>
                 <button
                   onClick={() => handleDelete(event._id)}

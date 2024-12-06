@@ -19,9 +19,8 @@ export const getAllParticipants = createAsyncThunk(
 export const createParticipant = createAsyncThunk(
     'participants/create',
     async (formData, { rejectWithValue }) => {
-        console.log(formData);
         
-        console.log(name)
+       
       try {
         const response = await ParticipantService.createParticipant(formData);
         return response; 
