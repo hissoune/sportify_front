@@ -156,7 +156,7 @@ const EventPage = () => {
         {filteredEvents?.map((event) => (
           <div
             key={event._id}
-            className="bg-white shadow-lg rounded-lg overflow-hidden transform transition-all hover:scale-105 cursor-pointer"
+            className="bg-gray-200 shadow-lg rounded-lg overflow-hidden transform transition-all hover:scale-105 cursor-pointer"
           >
             <img
               src={event.imagePath}
