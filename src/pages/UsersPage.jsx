@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 const UsersPage = () => {
   const dispatch = useDispatch();
   const { participants, loading, error } = useSelector((state) => state.participants);
-  
+   
   console.log('pararar',participants);
   
   const [searchTerm, setSearchTerm] = useState("");
@@ -58,10 +58,12 @@ const UsersPage = () => {
       });
     
   };
-
   const filteredParticipants = participants.filter((participant) =>
     participant.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+
+ 
 
   if (loading) {
     return <div>Loading...</div>;
@@ -83,20 +85,21 @@ const UsersPage = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full md:w-1/3 px-4 py-2 border rounded-lg shadow-sm"
         />
+     
         <button
           onClick={() => handleOpenModal()}
-          className="ml-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          className="ml-4 bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transform transition-all hover:scale-105 cursor-pointer"
         >
           Add User
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm: md:grid-cols-2 lg:grid-cols-4 gap-4">
         {filteredParticipants?.map((user) => (
-          <div key={user._id} className="bg-white shadow-lg rounded-lg p-6 flex flex-col">
+          <div key={user._id} className={`${user.gender == 'man'?'bg-blue-300':'bg-pink-300'} shadow-lg rounded-lg p-6 flex flex-col`}>
             <div className="flex items-center mb-4">
               <img
-                src="https://i.pinimg.com/736x/03/eb/d6/03ebd625cc0b9d636256ecc44c0ea324.jpg"
+                src={user.imagePath}
                 alt={user.name}
                 className="w-16 h-16 rounded-full border mr-4"
               />
