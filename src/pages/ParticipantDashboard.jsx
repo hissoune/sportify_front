@@ -1,10 +1,31 @@
-import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux'; 
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import { getEventsForParticipant } from '../redux/slices/EventSlice';
 
 const ParticipantDashboard = () => {
-  const user = useSelector((state) => state.auth.user); 
+  const user = useSelector((state) => state.auth.user);
+
+  const dispatch = useDispatch();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const { events, loading, error } = useSelector((state) => state.events);
+
+  useEffect(() => {
+    dispatch(getEventsForParticipant());
+  }, [dispatch]);
+
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
 
   const statistics = {
     totalEvents: 150,
@@ -17,6 +38,23 @@ const ParticipantDashboard = () => {
   useEffect(() => {
     AOS.init({ duration: 1000 });
   }, []);
+
+  const filteredEvents = events
+  .filter((event) => 
+    event.name.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+  .sort((a, b) => new Date(a.date) - new Date(b.date)) 
+  .slice(0, 3); 
+  
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+
 
   return (
     <div className=" min-h-screen py-10">
@@ -46,23 +84,20 @@ const ParticipantDashboard = () => {
         </div>
 
         <div className="mb-12">
+
+
           <h2 className="text-3xl font-bold text-center mb-6" data-aos="fade-up">Featured Events</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-lg shadow-lg" data-aos="fade-up">
-              <img src="https://via.placeholder.com/300x200" alt="Marathon" className="w-full rounded-lg" />
-              <h3 className="text-xl font-semibold mt-4">New York Marathon</h3>
-              <p className="mt-2">Join the most iconic marathon race of the year!</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-lg" data-aos="fade-up">
-              <img src="https://via.placeholder.com/300x200" alt="Football Match" className="w-full rounded-lg" />
-              <h3 className="text-xl font-semibold mt-4">Champions League Finals</h3>
-              <p className="mt-2">Catch the final match of the prestigious football competition!</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-lg" data-aos="fade-up">
-              <img src="https://via.placeholder.com/300x200" alt="Football Match" className="w-full rounded-lg" />
-              <h3 className="text-xl font-semibold mt-4">World Cup Qualifiers</h3>
-              <p className="mt-2">The most thrilling football qualifiers you can't miss!</p>
-            </div>
+            {filteredEvents.map((event) => (
+              <div className="bg-white p-6 rounded-lg shadow-lg" data-aos="fade-up">
+                <img src={event.imagePath} alt="Marathon" className="w-full rounded-lg" />
+                <h3 className="text-xl font-semibold mt-4">{event.name}</h3>
+                <h3 className="text-xl font-semibold mt-4">{formatDate(event.date)}</h3>
+                <p className="mt-2">Join the most iconic marathon race of the year!</p>
+              </div>
+            ))}
+
+
           </div>
         </div>
 
