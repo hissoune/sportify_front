@@ -2,13 +2,13 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import EventsService from '../../services/EventsService';
 
 export const getAllEvents = createAsyncThunk(
-    'events/getAll', 
+    'events/getAll',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await EventsService.getAllEvents(); 
-            return response; 
+            const response = await EventsService.getAllEvents();
+            return response;
         } catch (error) {
-      
+
             return rejectWithValue(error.response ? error.response.data : 'An error occurred');
         }
     }
@@ -16,14 +16,14 @@ export const getAllEvents = createAsyncThunk(
 
 export const createEvent = createAsyncThunk(
     'events/create',
-    async (formdata,{ rejectWithValue })=>{
+    async (formdata, { rejectWithValue }) => {
         console.log(formdata);
-        
+
         try {
-            const response = await EventsService.createEvent(formdata); 
-            return response; 
+            const response = await EventsService.createEvent(formdata);
+            return response;
         } catch (error) {
-      
+
             return rejectWithValue(error.response ? error.response.data : 'An error occurred');
         }
     }
@@ -33,35 +33,35 @@ export const createEvent = createAsyncThunk(
 export const updateEvent = createAsyncThunk(
     'events/update',
     async ({ id, formData }, { rejectWithValue }) => {
-      try {
-        const response = await EventsService.updateEvent(id, formData); 
-        return  response ;
-      } catch (error) {
-        return rejectWithValue(error.response ? error.response.data : 'An error occurred');
-      }
+        try {
+            const response = await EventsService.updateEvent(id, formData);
+            return response;
+        } catch (error) {
+            return rejectWithValue(error.response ? error.response.data : 'An error occurred');
+        }
     }
-  );
+);
 
 
-  export const deleteEvent = createAsyncThunk(
+export const deleteEvent = createAsyncThunk(
     'events/delete',
     async (id, { rejectWithValue }) => {
         try {
-            const response = await EventsService.delteEvent(id); 
-            return id; 
+            const response = await EventsService.delteEvent(id);
+            return id;
         } catch (error) {
             return rejectWithValue(error.response ? error.response.data : 'An error occurred');
         }
     }
 );
 export const getEventById = createAsyncThunk(
-    'events/getEventById', 
+    'events/getEventById',
     async (id, { rejectWithValue }) => {
         try {
-            const response = await EventsService.getEventById(id); 
-            return response; 
+            const response = await EventsService.getEventById(id);
+            return response;
         } catch (error) {
-      
+
             return rejectWithValue(error.response ? error.response.data : 'An error occurred');
         }
     }
@@ -69,15 +69,27 @@ export const getEventById = createAsyncThunk(
 
 export const removeParticipant = createAsyncThunk(
     'events/removeparticipant',
-    async ({participantId,eventId}, { rejectWithValue }) => {
-        console.log('parra',participantId);
-        
+    async ({ participantId, eventId }, { rejectWithValue }) => {
+
         try {
-            const response = await EventsService.removeParticipant(participantId,eventId);
+            const response = await EventsService.removeParticipant(participantId, eventId);
             console.log(response);
-             
-            return response; 
+
+            return response;
         } catch (error) {
+            return rejectWithValue(error.response ? error.response.data : 'An error occurred');
+        }
+    }
+);
+
+export const getEventsForParticipant = createAsyncThunk(
+    'events/public',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await EventsService.getEventsForParticipant();
+            return response;
+        } catch (error) {
+
             return rejectWithValue(error.response ? error.response.data : 'An error occurred');
         }
     }
@@ -85,7 +97,7 @@ export const removeParticipant = createAsyncThunk(
 
 const initialState = {
     events: [],
-    event:{},
+    event: {},
     loading: false,
     error: null
 };
@@ -114,7 +126,7 @@ const eventsSlice = createSlice({
             })
             .addCase(createEvent.fulfilled, (state, action) => {
                 state.loading = false;
-                state.events = [...state.events, action.payload]; 
+                state.events = [...state.events, action.payload];
             })
             .addCase(createEvent.rejected, (state, action) => {
                 state.loading = false;
@@ -123,25 +135,25 @@ const eventsSlice = createSlice({
             .addCase(updateEvent.pending, (state) => {
                 state.loading = true;
                 state.error = null;
-              })
-              .addCase(updateEvent.fulfilled, (state, action) => {
+            })
+            .addCase(updateEvent.fulfilled, (state, action) => {
                 state.loading = false;
                 const { id, data } = action.payload;
                 state.events = state.events.map((event) =>
-                  event.id === id ? { ...event, ...data } : event
+                    event.id === id ? { ...event, ...data } : event
                 );
-              })
-              .addCase(updateEvent.rejected, (state, action) => {
+            })
+            .addCase(updateEvent.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-              })
-              .addCase(getEventById.pending, (state) => {
+            })
+            .addCase(getEventById.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
             .addCase(getEventById.fulfilled, (state, action) => {
                 state.loading = false;
-                state.event = action.payload;  
+                state.event = action.payload;
             })
             .addCase(getEventById.rejected, (state, action) => {
                 state.loading = false;
@@ -154,7 +166,7 @@ const eventsSlice = createSlice({
             .addCase(removeParticipant.fulfilled, (state, action) => {
                 state.loading = false;
                 const { participantId, eventId } = action.payload;
-                
+
                 if (state.event.id === eventId) {
                     state.event.participants = state.event.participants.filter(p => p.id !== participantId);
                 } else {
@@ -169,7 +181,7 @@ const eventsSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
-              .addCase(deleteEvent.pending, (state) => {
+            .addCase(deleteEvent.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
@@ -181,7 +193,18 @@ const eventsSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
-            
+            .addCase(getEventsForParticipant.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getEventsForParticipant.fulfilled, (state, action) => {
+                state.loading = false;
+                state.events = action.payload;
+            })
+            .addCase(getEventsForParticipant.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
     }
 });
 
