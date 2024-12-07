@@ -59,7 +59,6 @@ getEventById:async (id)=>{
       }
 },
 removeParticipant: async (participantId, eventId) => {
-    console.log('Participant ID:', participantId);
     const id = eventId;
     try {
       const response = await axiosInstance.delete(`/events/removeParticipant/${id}`, {
@@ -69,6 +68,17 @@ removeParticipant: async (participantId, eventId) => {
     } catch (error) {
       console.error('Deleting participant failed:', error);
       throw error;
+    }
+  },
+  getEventsForParticipant:async ()=>{
+    try {
+      const response = await axiosInstance.get('/events/public');
+     
+      
+      return response.data; 
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error; 
     }
   }
   

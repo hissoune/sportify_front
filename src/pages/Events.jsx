@@ -1,27 +1,84 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getEventsForParticipant } from '../redux/slices/EventSlice';
+import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 
 const Events = () => {
-  const registeredEvents =[]; 
+  const dispatch = useDispatch();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const { events, loading, error } = useSelector((state) => state.events);
+
+  useEffect(() => {
+    dispatch(getEventsForParticipant());
+  }, [dispatch]);
+
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
+  const filteredEvents = events.filter((event) =>
+    event.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className=" min-h-screen">
       <div className="container mx-auto py-10">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">My Registered Events</h1>
-        {registeredEvents && registeredEvents.length > 0 ? (
+        <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">My Registered Events</h1>
+        <div className="flex justify-centert mb-10">
+      <input
+          type="text"
+          placeholder="Search users..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full  px-4 py-2 border rounded-lg shadow-sm"
+        />
+      
+      </div>
+        {filteredEvents && filteredEvents.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {registeredEvents.map((event) => (
-              <div
-                key={event.id}
-                className="bg-white shadow-lg rounded-lg p-4 hover:shadow-xl transition duration-300"
-              >
-                <h2 className="text-xl font-semibold text-gray-800">{event.title}</h2>
-                <p className="text-gray-600 mt-2">{event.date}</p>
-                <p className="text-gray-500 text-sm mt-2">{event.description}</p>
-                <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300">
-                  View Details
-                </button>
-              </div>
+            {filteredEvents.map((event) => (
+               <div
+               key={event._id}
+               className="bg-gray-200 shadow-lg rounded-lg overflow-hidden transform transition-all hover:scale-105 cursor-pointer"
+             >
+               <img
+                 src={event.imagePath}
+                 alt={event.name}
+                 className="w-full h-40 object-cover"
+                 onClick={() => handleNavigateToSinglePage(event)}
+   
+               />
+               <div className="p-4">
+                 <h2 className="text-xl font-semibold mb-2">{event.name}</h2>
+                 <p className="text-gray-600 mb-1">
+                   <strong>Date:</strong> {formatDate(event.date)}
+                 </p>
+                 <p className="text-gray-600 mb-1">
+                   <strong>Location:</strong> {event.location}
+                 </p>
+                 <p className="text-gray-600 mb-4">
+   
+                   <strong>Members: </strong> {event.participants.length}
+                 </p>
+                
+               </div>
+             </div>
             ))}
           </div>
         ) : (

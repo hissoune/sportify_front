@@ -13,9 +13,9 @@ const Navbar = () => {
       };
 
   return (
-    <nav className="bg-gradient-to-r from-blue-500 to-green-500 text-white py-4 shadow-lg">
+    <nav className=" bg-gray-800 text-white py-4 shadow-lg">
       <div className="container mx-auto flex justify-between items-center">
-        <div>
+        <div className='w-96'>
             <h1 className="text-3xl font-extrabold text-white">
          <img src="/2bed3446db10b86af56e902479b3a9df-removebg-preview.png" alt="" />
       </h1>
@@ -25,7 +25,7 @@ const Navbar = () => {
           <li>
             <Link
               to="/home"
-              className="text-lg font-semibold hover:text-blue-200 transition duration-300"
+              className="text-xl font-semibold hover:text-blue-200 transition duration-300"
             >
               Home
             </Link>
@@ -33,7 +33,7 @@ const Navbar = () => {
           <li>
             <Link
               to="/home/events"
-              className="text-lg font-semibold hover:text-blue-200 transition duration-300"
+              className="text-xl font-semibold hover:text-blue-200 transition duration-300"
             >
               My Events
             </Link>
@@ -41,7 +41,7 @@ const Navbar = () => {
           <li>
             <button
               onClick={handleLogout}
-              className="text-lg font-semibold hover:text-blue-200 transition duration-300"
+              className="text-xl font-semibold hover:text-blue-200 transition duration-300"
             >
               Logout
             </button>

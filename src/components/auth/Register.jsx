@@ -79,8 +79,8 @@ const Register = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-500 to-indigo-800">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
+    <div className="flex justify-center items-center h-screen bg-gradient-to-br from-gray-500 to-gray-800">
+      <div className="w-full max-w-md bg-gray-300 rounded-lg shadow-lg p-6">
         <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-6">
           <img
             src="/2bed3446db10b86af56e902479b3a9df-removebg-preview.png"
@@ -194,7 +194,7 @@ const Register = () => {
           </div>
           <button
             type="submit"
-            className="w-full py-2 text-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg hover:shadow-lg hover:from-blue-600 hover:to-indigo-700 transition duration-300"
+            className="w-full py-2 text-lg font-semibold text-white bg-gray-800 rounded-lg hover:shadow-lgtransition duration-300  hover:bg-gray-900 transform transition-all hover:scale-105 cursor-pointer"
             disabled={errors.name || errors.email || errors.password || isLoading}
           >
             {isLoading ? "Registering..." : "Register"}
